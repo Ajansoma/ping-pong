@@ -1,8 +1,10 @@
+import GameUI from './components/GameUI';
+
 function App() {
   return (
-    <>
-      <h1 className="bg-black">hi</h1>
-    </>
+    <div className="">
+      <GameUI />
+    </div>
   );
 }
 
