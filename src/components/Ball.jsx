@@ -5,11 +5,12 @@ const Ball = ({ onData }) => {
   const [delta, setDelta] = useState(0);
   const [x, setX] = useState(50);
   const [y, setY] = useState(50);
-  const [direction, setDirection] = useState({ x: 0, y: 0 });
-  const INITIAL_VELOCITY = 0.025;
+  const [direction, setDirection] = useState({ x: 0, y: null });
+  const [velocity, setVelocity] = useState(0.025);
   const [lastTime, setLastTime] = useState(null);
   const [rect, setRect] = useState('');
   const containerRef = useRef(null);
+  const VELOCITY_INCREASE = 0.00001;
   const [lostGame, setLostGame] = useState(false);
 
   useEffect(() => {
@@ -18,15 +19,6 @@ const Ball = ({ onData }) => {
       setDirection({ x: Math.cos(heading), y: Math.sin(heading) });
     }
     window.requestAnimationFrame(updateTime);
-  }, []);
-
-  // useEffect(() => {
-  //   setRect(containerRef.current.getBoundingClientRect());
-  // }, []);
-
-  useEffect(() => {
-    requestAnimationFrame(updateTime);
-    return () => cancelAnimationFrame(updateTime);
   }, []);
 
   const updateTime = function (time) {
@@ -41,20 +33,42 @@ const Ball = ({ onData }) => {
     }
     onData({ delta, y });
     setLastTime(time);
-    setX((prevState) => (prevState += direction.x * INITIAL_VELOCITY * delta));
-    setY((prevState) => (prevState += direction.y * INITIAL_VELOCITY * delta));
+
+    setX((prevState) => (prevState += direction.x * velocity * delta));
+    setY((prevState) => (prevState += direction.y * velocity * delta));
 
     if (rect.right >= window.innerWidth || rect.left <= 0) {
       setLostGame(true);
     }
-    if (rect.bottom >= window.innerHeight || rect.top <= 0) {
-      setDirection((prevDirec) => ({ ...prevDirec, y: (prevDirec.y *= -1) }));
-    }
-    if (rect.right >= window.innerWidth || rect.left <= 0) {
-      setDirection((prevDirec) => ({ ...prevDirec, x: (prevDirec.x *= -1) }));
-    }
   };
   window.requestAnimationFrame(updateTime);
+  // console.log(velocity);
+
+  useEffect(() => {
+    return () => cancelAnimationFrame(updateTime);
+  }, []);
+
+  useEffect(() => {
+    if (rect.bottom >= window.innerHeight || rect.top <= 0) {
+      setDirection((prevDirec) => ({
+        ...prevDirec,
+        y: -prevDirec.y,
+      }));
+      setVelocity((prevVel) => -prevVel);
+    }
+    if (rect.right >= window.innerWidth || rect.left <= 0) {
+      setDirection((prevDirec) => ({
+        ...prevDirec,
+        x: -prevDirec.x,
+      }));
+      setVelocity((prevVel) => -prevVel);
+    }
+  }, [
+    rect.right >= window.innerWidth,
+    rect.left <= 0,
+    rect.bottom >= window.innerHeight,
+    rect.top <= 0,
+  ]);
 
   return (
     <div

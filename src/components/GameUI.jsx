@@ -6,7 +6,7 @@ const GameUI = () => {
   const [positionPlayer, setPositionPlayer] = useState(50);
   const [positionComputer, setPositionComputer] = useState(50);
   const [score] = useState([0, 0]);
-  const SPEED = 0.02;
+  const SPEED = 0.025;
 
   const handlePlayerMoving = function (e) {
     setPositionPlayer((e.clientY / window.innerHeight) * 100);
@@ -36,6 +36,7 @@ const GameUI = () => {
         style={{ 'top': `${positionComputer}vh` }}
       ></div>
       <Ball onData={handleComputerMoving} />
+      {/* <Ball /> */}
     </section>
   );
 };
